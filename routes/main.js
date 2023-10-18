@@ -111,13 +111,14 @@ module.exports = function(app, shopData) {
         res.render('login.ejs', shopData);
     });
     app.post('/loggedin', function (req,res) {
-        let formUser = req.body.user;
+        //let formUser = req.body.user;
     
         // compare form with table
-        let sqlquery = "SELECT hashedPassword FROM user_details WHERE username = " + mysql.escape(formUser);
+        let sqlquery = "SELECT hashedPassword FROM user_details WHERE username = ?";
+        let newrecord = [req.body.user];
         
 
-        db.query(sqlquery, (err, result) => {
+        db.query(sqlquery, newrecord, (err, result) => {
             if (err) {
                 return console.error(err.message);
             }
@@ -140,4 +141,25 @@ module.exports = function(app, shopData) {
             }
         });
     });
+    app.get('/deleteuser', function (req,res) {
+        res.render('delete-user.ejs', shopData);
+    });
+    app.post('/deleteduser', function (req, res) {
+        
+        let sqlquery = "DELETE FROM user_details WHERE username = ?";
+        let newrecord = [req.body.user];
+    
+        db.query(sqlquery, newrecord, (err, result) => {
+            if (err) {
+                return console.error(err.message);
+            } else {
+                if (result.affectedRows === 0) {
+                    res.send('User not found');
+                } else {
+                    res.send('User has been deleted');
+                }
+            }
+        });
+    });
+    
 }
