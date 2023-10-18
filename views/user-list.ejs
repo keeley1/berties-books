@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Books we sell</title>
+    <link rel="stylesheet"  type="text/css" href="main.css" />
+</head>
+<body>
+    <h1><%=shopName%> Shop</h1>
+    <h2>All of the users:</h2>
+    <% for (let i = 0; i < allUsers.length; i++) { %>
+        <ul>
+            <li><%= allUsers[i].username%></li>
+        </ul>
+        <% } %>
+</body>
+</html>
