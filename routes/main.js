@@ -1,4 +1,13 @@
 module.exports = function(app, shopData) {
+    const redirectLogin = (req, res, next) => {
+        if (!req.session.userId) {
+            res.redirect('./login')
+        }
+        else {
+            next();
+        }
+    }
+
     var mysql = require('mysql');
     const bcrypt = require('bcrypt'); 
 
@@ -52,7 +61,7 @@ module.exports = function(app, shopData) {
         }); 
 
     }); 
-    app.get('/list', function(req, res) {
+    app.get('/list', redirectLogin, function(req, res) {
         // query database to get all the books
         let sqlquery = "SELECT * FROM books";
         // execute sql query
@@ -94,7 +103,7 @@ module.exports = function(app, shopData) {
             res.render('bargain-books', newData2)
         });
     });
-    app.get('/listusers', function (req,res) {
+    app.get('/listusers', redirectLogin, function (req,res) {
         // query database to get all the users
         let sqlquery = "SELECT username FROM user_details";
         // execute sql query
@@ -111,12 +120,8 @@ module.exports = function(app, shopData) {
         res.render('login.ejs', shopData);
     });
     app.post('/loggedin', function (req,res) {
-        //let formUser = req.body.user;
-    
-        // compare form with table
         let sqlquery = "SELECT hashedPassword FROM user_details WHERE username = ?";
         let newrecord = [req.body.user];
-        
 
         db.query(sqlquery, newrecord, (err, result) => {
             if (err) {
@@ -132,6 +137,9 @@ module.exports = function(app, shopData) {
                         if (err) {
                             res.send('Cannot find user');
                         } else if (result === true) {
+                            // save user session here, when login is successful 
+                            req.session.userId = req.body.user; 
+                            
                             res.send('You have successfully logged in:) welcome back ' + req.body.user);
                         } else {
                             res.send('Error');
@@ -161,5 +169,13 @@ module.exports = function(app, shopData) {
             }
         });
     });
+    app.get('/logout', redirectLogin, (req, res) => {
+        req.session.destroy(err => {
+            if (err) {
+                return res.redirect('/')
+            }
+            res.send('you are now logged out! <a href=' + './' + '>Home</a>');
+        })
+    })
     
 }

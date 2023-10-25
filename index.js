@@ -2,12 +2,22 @@
 var express = require ('express')
 var ejs = require('ejs')
 var bodyParser= require ('body-parser')
+var session = require('express-session')
 
 // Create the express application object
 const app = express()
 const port = 8000
 const mysql = require('mysql')
 app.use(bodyParser.urlencoded({ extended: true }))
+
+app.use(session({
+    secret: 'somerandomstuff',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        expires: 600000
+    }
+}));
 
 const db = mysql.createConnection ({
     host: 'localhost',
